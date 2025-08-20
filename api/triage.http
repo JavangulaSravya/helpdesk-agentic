@@ -1,0 +1,6 @@
+POST http://localhost:8080/api/agent/triage
+Content-Type: application/json
+
+{
+  "ticketId": "68a5d8f090b066bb2baf38e0"
+}
