@@ -8,7 +8,11 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "https://helpdesk-agentic-app.onrender.com/",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+}));
+
 
 // ✅ Import routes
 import ticketRoutes from "./routes/ticketRoutes.js";
