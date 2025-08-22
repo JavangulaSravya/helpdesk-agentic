@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import TicketForm from "./TicketForm";
+import TicketList from "./TicketList";
 
 function App() {
+  const [refresh, setRefresh] = useState(false);
+
   return (
     <div className="App">
-      <TicketForm />
+      <TicketForm onTicketCreated={() => setRefresh(!refresh)} />
+      <TicketList key={refresh} />
     </div>
   );
 }

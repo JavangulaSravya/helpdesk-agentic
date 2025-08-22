@@ -1,34 +1,40 @@
 import React, { useEffect, useState } from "react";
-import API from "./api";
+import { fetchTickets } from "./api";
+import AgentSuggestion from "./AgentSuggestion";
 
-function TicketList() {
+const TicketList = () => {
   const [tickets, setTickets] = useState([]);
 
+  const getTickets = async () => {
+    try {
+      const res = await fetchTickets();
+      setTickets(res.data);
+    } catch (err) {
+      console.error("Failed to fetch tickets:", err);
+      alert("Failed to fetch tickets");
+    }
+  };
+
   useEffect(() => {
-    const fetchTickets = async () => {
-      try {
-        const res = await API.get("/tickets");
-        setTickets(res.data);
-      } catch (err) {
-        console.error("Error fetching tickets:", err);
-      }
-    };
-    fetchTickets();
+    getTickets();
   }, []);
+
+  if (tickets.length === 0) return <p>No tickets available.</p>;
 
   return (
     <div>
-      <h2>Tickets</h2>
-      <ul>
-        {tickets.map((ticket) => (
-          <li key={ticket._id}>
-            <strong>{ticket.title}</strong> - {ticket.description} (
-            {ticket.priority})
-          </li>
-        ))}
-      </ul>
+      <h2>All Tickets</h2>
+      {tickets.map(ticket => (
+        <div key={ticket._id} style={{ border: "1px solid #ccc", padding: "10px", marginBottom: "10px" }}>
+          <p><strong>Title:</strong> {ticket.title}</p>
+          <p><strong>Description:</strong> {ticket.description}</p>
+          <p><strong>Category:</strong> {ticket.category}</p>
+          <p><strong>Status:</strong> {ticket.status}</p>
+          <AgentSuggestion ticketId={ticket._id} />
+        </div>
+      ))}
     </div>
   );
-}
+};
 
 export default TicketList;

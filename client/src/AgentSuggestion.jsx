@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react";
+import { fetchSuggestion } from "./api";
 
 const AgentSuggestion = ({ ticketId }) => {
   const [suggestion, setSuggestion] = useState(null);
 
   useEffect(() => {
-    const fetchSuggestion = async () => {
+    const getSuggestion = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/api/agent/suggestion/${ticketId}`);
-        if (!res.ok) throw new Error("Failed to fetch suggestion");
-        const data = await res.json();
-        setSuggestion(data);
+        const res = await fetchSuggestion(ticketId);
+        setSuggestion(res.data);
       } catch (err) {
         console.error("Error fetching suggestion:", err);
       }
     };
-
-    fetchSuggestion();
+    getSuggestion();
   }, [ticketId]);
 
   if (!suggestion) return <p>No agent suggestion yet.</p>;

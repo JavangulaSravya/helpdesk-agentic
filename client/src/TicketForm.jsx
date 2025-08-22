@@ -1,54 +1,37 @@
 import React, { useState } from "react";
-import API from "./api";
+import { createTicket, createSuggestion } from "./api";
 
-function TicketForm({ onTicketCreated }) {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    priority: "low",
-  });
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+const TicketForm = ({ onTicketCreated }) => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("tech");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await API.post("/tickets", formData);
-      onTicketCreated(res.data); // notify parent
-      setFormData({ title: "", description: "", priority: "low" });
+      const ticket = await createTicket({ title, description, category });
+      await createSuggestion(ticket.data._id); // trigger agent suggestion
+      setTitle(""); setDescription(""); setCategory("tech");
+      onTicketCreated(); // refresh ticket list
     } catch (err) {
       console.error("Error creating ticket:", err);
+      alert("Failed to submit ticket");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        name="title"
-        placeholder="Title"
-        value={formData.title}
-        onChange={handleChange}
-      />
-      <textarea
-        name="description"
-        placeholder="Description"
-        value={formData.description}
-        onChange={handleChange}
-      />
-      <select name="priority" value={formData.priority} onChange={handleChange}>
-        <option value="low">Low</option>
-        <option value="medium">Medium</option>
-        <option value="high">High</option>
+    <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
+      <h2>Create Ticket</h2>
+      <input placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} required />
+      <input placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} required />
+      <select value={category} onChange={e => setCategory(e.target.value)}>
+        <option value="tech">Tech</option>
+        <option value="shipping">Shipping</option>
+        <option value="billing">Billing</option>
       </select>
       <button type="submit">Submit Ticket</button>
     </form>
   );
-}
+};
 
 export default TicketForm;
