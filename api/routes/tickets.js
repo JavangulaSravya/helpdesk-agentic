@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Ticket = require("../models/Ticket");
 
-// GET /api/tickets
+// GET all tickets
 router.get("/", async (req, res) => {
   try {
-    const tickets = await Ticket.find().sort({ createdAt: -1 });
+    const tickets = await Ticket.find();
     res.json(tickets);
   } catch (err) {
     console.error(err);
@@ -13,12 +13,12 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST /api/tickets
+// POST create a ticket
 router.post("/", async (req, res) => {
   try {
     const { title, description, category } = req.body;
-    const newTicket = await Ticket.create({ title, description, category, status: "open" });
-    res.json(newTicket);
+    const ticket = await Ticket.create({ title, description, category });
+    res.json(ticket);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
