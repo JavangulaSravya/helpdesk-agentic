@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_BASE =
   process.env.NODE_ENV === "production"
-    ? "https://helpdesk-agentic-application.onrender.com" // <== your backend on Render
+    ? "https://helpdesk-agentic-application.onrender.com/" // <== your backend on Render
     : "http://localhost:8080";
 
 const api = axios.create({
