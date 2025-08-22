@@ -1,33 +1,25 @@
-import express from "express";
-import Ticket from "../models/Ticket.js";
-
+// routes/agent.js
+const express = require("express");
 const router = express.Router();
 
-// Dummy AI Agent Suggestion (replace with real AI later)
-const getAgentSuggestion = (ticket) => {
-  if (ticket.category === "Shipping") return "Check shipping provider status.";
-  if (ticket.category === "Billing") return "Verify payment records.";
-  return "Assign to support agent.";
-};
+// Mock AI suggestion logic (replace with real AI API later if needed)
+router.post("/triage", (req, res) => {
+  const { title, description, category } = req.body;
 
-// ✅ AI triage endpoint
-router.post("/triage", async (req, res) => {
-  try {
-    const { ticketId } = req.body;
-    const ticket = await Ticket.findOne({ ticketId });
+  let suggestion = "Assign to human agent";
 
-    if (!ticket) {
-      return res.status(404).json({ error: "Ticket not found" });
-    }
-
-    const suggestion = getAgentSuggestion(ticket);
-    ticket.agentSuggestion = suggestion;
-    await ticket.save();
-
-    res.json({ suggestion });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  if (category === "Shipping") {
+    suggestion = "Check shipping provider API";
+  } else if (category === "Billing") {
+    suggestion = "Verify payment gateway logs";
+  } else if (category === "Technical") {
+    suggestion = "Restart service and clear cache";
   }
+
+  res.json({
+    ticket: { title, description, category },
+    suggestion,
+  });
 });
 
-export default router;
+module.exports = router;
