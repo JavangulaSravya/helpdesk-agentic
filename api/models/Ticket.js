@@ -1,12 +1,12 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const ticketSchema = new mongoose.Schema({
-  title: String,
-  description: String,
-  category: String,
-  status: { type: String, default: "open" },
-  assignee: { type: String, default: null },
-  agentSuggestionId: { type: mongoose.Schema.Types.ObjectId, ref: "AgentSuggestion" }
-}, { timestamps: true });
+  ticketId: { type: Number, required: true },
+  subject: { type: String, required: true },
+  description: { type: String, required: true },
+  category: { type: String, required: true },
+  agentSuggestion: { type: String, default: "" },
+});
 
-module.exports = mongoose.model("Ticket", ticketSchema);
+const Ticket = mongoose.model("Ticket", ticketSchema);
+export default Ticket;

@@ -1,43 +1,33 @@
-const express = require("express");
-const router = express.Router();
-const AgentSuggestion = require("../models/AgentSuggestion");
-const Ticket = require("../models/Ticket");
+import express from "express";
+import Ticket from "../models/Ticket.js";
 
-// POST /triage - create suggestion
+const router = express.Router();
+
+// Dummy AI Agent Suggestion (replace with real AI later)
+const getAgentSuggestion = (ticket) => {
+  if (ticket.category === "Shipping") return "Check shipping provider status.";
+  if (ticket.category === "Billing") return "Verify payment records.";
+  return "Assign to support agent.";
+};
+
+// ✅ AI triage endpoint
 router.post("/triage", async (req, res) => {
   try {
     const { ticketId } = req.body;
-    const ticket = await Ticket.findById(ticketId);
-    if (!ticket) return res.status(404).json({ error: "Ticket not found" });
+    const ticket = await Ticket.findOne({ ticketId });
 
-    const suggestion = await AgentSuggestion.create({
-      ticketId: ticket._id,
-      predictedCategory: "tech",
-      articleIds: [],
-      draftReply: "This is a stub reply from the agent.",
-      confidence: 0.9,
-      autoClosed: false,
-      modelInfo: { provider: "stub", model: "local", promptVersion: "v1", latencyMs: 10 },
-      createdAt: new Date(),
-    });
+    if (!ticket) {
+      return res.status(404).json({ error: "Ticket not found" });
+    }
 
-    res.json(suggestion);
+    const suggestion = getAgentSuggestion(ticket);
+    ticket.agentSuggestion = suggestion;
+    await ticket.save();
+
+    res.json({ suggestion });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// GET /suggestion/:ticketId - fetch suggestion for a ticket
-router.get("/suggestion/:ticketId", async (req, res) => {
-  try {
-    const suggestion = await AgentSuggestion.findOne({ ticketId: req.params.ticketId });
-    if (!suggestion) return res.status(404).json({ error: "No suggestion found" });
-    res.json(suggestion);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-module.exports = router;
+export default router;
