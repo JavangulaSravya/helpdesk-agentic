@@ -1,16 +1,20 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const agentSuggestionSchema = new mongoose.Schema(
-  {
-    ticketId: { type: mongoose.Schema.Types.ObjectId, ref: "Ticket" },
-    predictedCategory: String,
-    draftReply: String,
-    confidence: Number,
-    autoClosed: Boolean,
-    articleIds: [String],
-    modelInfo: Object,
+const AgentSuggestionSchema = new Schema({
+  ticketId: { type: Schema.Types.ObjectId, ref: "Ticket", required: true },
+  predictedCategory: { type: String },
+  articleIds: { type: [String], default: [] },
+  draftReply: { type: String },
+  confidence: { type: Number },
+  autoClosed: { type: Boolean, default: false },
+  modelInfo: {
+    provider: String,
+    model: String,
+    promptVersion: String,
+    latencyMs: Number,
   },
-  { timestamps: true }
-);
+  createdAt: { type: Date, default: Date.now },
+}, { timestamps: true });
 
-module.exports = mongoose.model("AgentSuggestion", agentSuggestionSchema);
+module.exports = mongoose.model("AgentSuggestion", AgentSuggestionSchema);
